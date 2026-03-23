@@ -128,3 +128,8 @@ button:active {
     overflow-x: auto;
 }
 
+button.ativo {
+    transform: scale(0.9);
+    filter: brightness(1.2);
+}
+

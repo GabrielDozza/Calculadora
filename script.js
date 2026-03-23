@@ -30,9 +30,17 @@ function adicionarValor(valor) {
         calculado = false;
     }
 
-    expressao += valor;
+    if (valor === "%") {
+    if (expressao === "") return;
 
+    let ultimo = expressao.slice(-1);
+
+    if (isNaN(ultimo) && ultimo !== ")") return;
+}
+
+    expressao += valor;
     resultado.innerText = expressao;
+    animarBotao(valor);
 }
 
 botoes.forEach(botao => {
@@ -92,6 +100,8 @@ document.addEventListener("keydown", (event) => {
         resultado.innerText = "";
         calculado = false;
     }
+
+    animarBotao(tecla);
 });
 
 function calcularResultado() {
@@ -101,16 +111,42 @@ function calcularResultado() {
             .replace(/×/g, "*")
             .replace(/(\d+\.?\d*)%/g, "($1/100)");
 
-        let resultadoFinal = eval(conta);
+       let resultadoFinal = eval(conta);
 
-        historico.innerText = expressao;
-        resultado.innerText = resultadoFinal;
+let textoResultado;
 
-        expressao = resultadoFinal.toString();
-        calculado = true;
+if (Number.isInteger(resultadoFinal)) {
+    textoResultado = resultadoFinal.toString();
+} else {
+    let limitado = resultadoFinal.toFixed(5);
+
+    if (parseFloat(limitado) !== resultadoFinal) {
+        textoResultado = parseFloat(limitado) + "...";
+    } else {
+        textoResultado = parseFloat(limitado).toString();
+    }
+}
+
+resultado.innerText = textoResultado;
+historico.innerText = expressao;
+
+expressao = resultadoFinal.toString();
+calculado = true;
 
     } catch {
         resultado.innerText = "Erro";
         expressao = "";
     }
+}
+
+function animarBotao(valor) {
+    botoes.forEach(botao => {
+        if (botao.dataset.valor === valor || botao.innerText === valor) {
+            botao.classList.add("ativo");
+
+            setTimeout(() => {
+                botao.classList.remove("ativo");
+            }, 150);
+        }
+    });
 }
