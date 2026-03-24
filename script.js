@@ -29,9 +29,36 @@ function adicionarValor(valor) {
         calculado = false;
     }
 
-    // Não deixar operadores duplicados
-    if (["+", "-", "*", "/", "."].includes(valor)) {
-        if (ultimoEhOperador()) return;
+   // Controle de operadores (exceto "-")
+    if (["+", "*", "/", "."].includes(valor)) {
+    if (ultimoEhOperador()) return;
+    }
+
+
+    if (valor === "-") {
+
+    
+    if (expressao === "") {
+        expressao += valor;
+        resultado.classList.remove("pequeno");
+        resultado.innerText = expressao;
+        animarBotao(valor);
+        return;
+    }
+
+    let ultimo = expressao.slice(-1);
+
+    
+    if (/[+\-*/(]$/.test(ultimo)) {
+        expressao += valor;
+        resultado.classList.remove("pequeno");
+        resultado.innerText = expressao;
+        animarBotao(valor);
+        return;
+    }
+
+    // ❌ impedir "--"
+    if (ultimo === "-") return;
     }
 
     // Evitar múltiplos pontos
