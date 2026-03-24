@@ -41,14 +41,12 @@ body {
     gap: 12px;
 }
 
-/* PRIMEIRA LINHA (5 botões) */
 .linha-especial {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px; /* menor pra ficar mais juntinho */
+    gap: 8px; 
 }
 
-/* RESTO NORMAL */
 .grid-normal {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -131,5 +129,9 @@ button:active {
 button.ativo {
     transform: scale(0.9);
     filter: brightness(1.2);
+}
+
+.resultado.pequeno {
+    font-size: 20px;
 }
 

@@ -9,37 +9,68 @@ function ultimoEhOperador() {
     return /[+\-*/.]$/.test(expressao);
 }
 
+function expressaoValida() {
+    return !/[+\-*/.]$/.test(expressao);
+}
+
 function adicionarValor(valor) {
 
     if (valor === ",") valor = ".";
 
+    // Não deixar começar errado
+    if (expressao === "" && ["+", "*", "/", ")", "%"].includes(valor)) return;
+
+    // Se já calculou
+    if (calculado) {
+        if (/[0-9.(]/.test(valor)) {
+            expressao = "";
+            historico.innerText = "";
+        }
+        calculado = false;
+    }
+
+    // Não deixar operadores duplicados
     if (["+", "-", "*", "/", "."].includes(valor)) {
-        if (expressao === "" && valor !== "-") return;
         if (ultimoEhOperador()) return;
     }
 
+    // Evitar múltiplos pontos
     if (valor === ".") {
         let partes = expressao.split(/[+\-*/]/);
         let ultimoNumero = partes[partes.length - 1];
         if (ultimoNumero.includes(".")) return;
     }
 
-    if (calculado && !isNaN(valor)) {
-        expressao = "";
-        historico.innerText = "";
-        calculado = false;
+    // Controle de %
+    if (valor === "%") {
+        if (expressao === "") return;
+        let ultimo = expressao.slice(-1);
+        if (isNaN(ultimo) && ultimo !== ")") return;
     }
 
-    if (valor === "%") {
-    if (expressao === "") return;
+    // Controle de parênteses
+    if (valor === ")") {
+        let abertas = (expressao.match(/\(/g) || []).length;
+        let fechadas = (expressao.match(/\)/g) || []).length;
+        if (fechadas >= abertas) return;
+    }
 
-    let ultimo = expressao.slice(-1);
-
-    if (isNaN(ultimo) && ultimo !== ")") return;
-}
+    // Multiplicação automática
+    if (
+        expressao !== "" &&
+        (
+            (valor === "(" && /[0-9)]$/.test(expressao)) ||
+            (!isNaN(valor) && /\)$/.test(expressao))
+        )
+    ) {
+        expressao += "*";
+    }
 
     expressao += valor;
+
+    resultado.classList.remove("pequeno");
     resultado.innerText = expressao;
+
     animarBotao(valor);
 }
 
@@ -52,14 +83,16 @@ botoes.forEach(botao => {
         if (acao === "clear") {
             expressao = "";
             historico.innerText = "";
-            resultado.innerText = "";
+            resultado.classList.remove("pequeno");
+            resultado.innerText = "0";
             calculado = false;
             return;
         }
 
         if (acao === "backspace") {
             expressao = expressao.slice(0, -1);
-            resultado.innerText = expressao;
+            resultado.classList.remove("pequeno");
+            resultado.innerText = expressao || "0";
             return;
         }
 
@@ -71,7 +104,6 @@ botoes.forEach(botao => {
         if (valor) {
             adicionarValor(valor);
         }
-
     });
 });
 
@@ -91,13 +123,15 @@ document.addEventListener("keydown", (event) => {
 
     else if (tecla === "Backspace") {
         expressao = expressao.slice(0, -1);
-        resultado.innerText = expressao;
+        resultado.classList.remove("pequeno");
+        resultado.innerText = expressao || "0";
     }
 
     else if (tecla === "Escape") {
         expressao = "";
         historico.innerText = "";
-        resultado.innerText = "";
+        resultado.classList.remove("pequeno");
+        resultado.innerText = "0";
         calculado = false;
     }
 
@@ -105,37 +139,61 @@ document.addEventListener("keydown", (event) => {
 });
 
 function calcularResultado() {
+
+    if (expressao === "" || !expressaoValida()) {
+        resultado.classList.remove("pequeno");
+        resultado.innerText = "Conta incompleta";
+        resultado.classList.add("pequeno");
+        return;
+    }
+
     try {
         let conta = expressao
             .replace(/÷/g, "/")
             .replace(/×/g, "*")
             .replace(/(\d+\.?\d*)%/g, "($1/100)");
 
-       let resultadoFinal = eval(conta);
+        let resultadoFinal = eval(conta);
 
-let textoResultado;
+        // Divisão por zero
+        if (!isFinite(resultadoFinal)) {
+            resultado.innerText = "Não pode dividir por zero";
+            resultado.classList.add("pequeno");
+            expressao = "";
+            return;
+        }
 
-if (Number.isInteger(resultadoFinal)) {
-    textoResultado = resultadoFinal.toString();
-} else {
-    let limitado = resultadoFinal.toFixed(5);
+        let textoResultado;
 
-    if (parseFloat(limitado) !== resultadoFinal) {
-        textoResultado = parseFloat(limitado) + "...";
-    } else {
-        textoResultado = parseFloat(limitado).toString();
-    }
-}
+        if (Number.isInteger(resultadoFinal)) {
+            textoResultado = resultadoFinal.toString();
+        } else {
+            let limitado = resultadoFinal.toFixed(5);
 
-resultado.innerText = textoResultado;
-historico.innerText = expressao;
+            if (parseFloat(limitado) !== resultadoFinal) {
+                textoResultado = parseFloat(limitado) + "...";
+            } else {
+                textoResultado = parseFloat(limitado).toString();
+            }
+        }
 
-expressao = resultadoFinal.toString();
-calculado = true;
+        historico.innerText = expressao;
+
+        resultado.classList.remove("pequeno");
+        resultado.innerText = textoResultado;
+
+        expressao = resultadoFinal.toString();
+        calculado = true;
 
     } catch {
         resultado.innerText = "Erro";
+        resultado.classList.add("pequeno");
         expressao = "";
+
+        setTimeout(() => {
+            resultado.classList.remove("pequeno");
+            resultado.innerText = "0";
+        }, 1500);
     }
 }
 
