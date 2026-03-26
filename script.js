@@ -59,18 +59,15 @@ function adicionarValor(valor) {
         return;
     }
 
-    // ❌ impedir "--"
     if (ultimo === "-") return;
     }
-
-    // Evitar múltiplos pontos
+s
     if (valor === ".") {
         let partes = expressao.split(/[+\-*/]/);
         let ultimoNumero = partes[partes.length - 1];
         if (ultimoNumero.includes(".")) return;
     }
 
-    // Controle de %
     if (valor === "%") {
         if (expressao === "") return;
         let ultimo = expressao.slice(-1);
@@ -84,7 +81,6 @@ function adicionarValor(valor) {
         if (fechadas >= abertas) return;
     }
 
-    // Multiplicação automática
     if (
         expressao !== "" &&
         (
