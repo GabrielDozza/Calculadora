@@ -17,51 +17,43 @@ function adicionarValor(valor) {
 
     if (valor === ",") valor = ".";
 
-
-    // Não deixar começar errado
     if (expressao === "" && ["+", "*", "/", ")", "%"].includes(valor)) return;
 
-    // Se já calculou
-
     if (calculado) {
-        if (/[0-9.(]/.test(valor)) {
-            expressao = "";
-            historico.innerText = "";
+        if (["+", "-", "*", "/", "%"].includes(valor)) {
+            calculado = false;
+            historico.innerText = expressao;
+        } else {
+            calculado = false;
         }
-        calculado = false;
     }
 
-   // Controle de operadores (exceto "-")
     if (["+", "*", "/", "."].includes(valor)) {
-    if (ultimoEhOperador()) return;
+        if (ultimoEhOperador()) return;
     }
-
 
     if (valor === "-") {
+        if (expressao === "") {
+            expressao += valor;
+            resultado.classList.remove("pequeno");
+            resultado.innerText = expressao;
+            animarBotao(valor);
+            return;
+        }
 
-    
-    if (expressao === "") {
-        expressao += valor;
-        resultado.classList.remove("pequeno");
-        resultado.innerText = expressao;
-        animarBotao(valor);
-        return;
+        let ultimo = expressao.slice(-1);
+
+        if (/[+\-*/(]$/.test(ultimo)) {
+            expressao += valor;
+            resultado.classList.remove("pequeno");
+            resultado.innerText = expressao;
+            animarBotao(valor);
+            return;
+        }
+
+        if (ultimo === "-") return;
     }
 
-    let ultimo = expressao.slice(-1);
-
-    
-    if (/[+\-*/(]$/.test(ultimo)) {
-        expressao += valor;
-        resultado.classList.remove("pequeno");
-        resultado.innerText = expressao;
-        animarBotao(valor);
-        return;
-    }
-
-    if (ultimo === "-") return;
-    }
-s
     if (valor === ".") {
         let partes = expressao.split(/[+\-*/]/);
         let ultimoNumero = partes[partes.length - 1];
@@ -74,7 +66,6 @@ s
         if (isNaN(ultimo) && ultimo !== ")") return;
     }
 
-    // Controle de parênteses
     if (valor === ")") {
         let abertas = (expressao.match(/\(/g) || []).length;
         let fechadas = (expressao.match(/\)/g) || []).length;
@@ -180,7 +171,6 @@ function calcularResultado() {
 
         let resultadoFinal = eval(conta);
 
-        // Divisão por zero
         if (!isFinite(resultadoFinal)) {
             resultado.innerText = "Não pode dividir por zero";
             resultado.classList.add("pequeno");

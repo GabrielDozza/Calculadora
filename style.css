@@ -106,7 +106,6 @@ button:active {
     background: #f90202;
 }
 
-/* HISTÓRICO (conta digitada) */
 .historico {
     font-size: 16px;
     color: #888; /* mais apagado */
@@ -115,7 +114,6 @@ button:active {
     overflow-x: auto;
 }
 
-/* RESULTADO (valor final) */
 .resultado {
     font-size: 36px;
     color: white;
