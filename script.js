@@ -17,10 +17,12 @@ function adicionarValor(valor) {
 
     if (valor === ",") valor = ".";
 
+
     // Não deixar começar errado
     if (expressao === "" && ["+", "*", "/", ")", "%"].includes(valor)) return;
 
     // Se já calculou
+
     if (calculado) {
         if (/[0-9.(]/.test(valor)) {
             expressao = "";
